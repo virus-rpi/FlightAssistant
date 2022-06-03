@@ -16,6 +16,8 @@ class UI(QMainWindow):
         self.glWidget.setRotY(45, self.gyro_2)
         self.glWidget.setRotZ(45, self.gyro_3)
 
+
+
         timer = QtCore.QTimer(self)
         timer.setInterval(20)
         timer.timeout.connect(self.glWidget.updateGL)
