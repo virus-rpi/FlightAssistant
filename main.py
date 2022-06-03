@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5 import uic, QtCore
-
+import sys
 import getData
 from gl import *
 
