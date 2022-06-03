@@ -4,6 +4,7 @@ import sys
 import getData
 from gl import *
 
+
 class UI(QMainWindow):
     def __init__(self):
         super(UI, self).__init__()
