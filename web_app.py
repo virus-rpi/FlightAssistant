@@ -141,22 +141,19 @@ def avg_tick_speed():
     for i in tick_data:
         tick_time.append(i["tt"])
 
-    avg_tick_time = (sum(tick_time)/len(tick_time))/1000
+    avg_tick_time = (sum(tick_time)/len(tick_time))
 
-    x = 1
-
-    while avg_tick_time < 1:
-        avg_tick_time *= 2
-        x += 1
-
-    return str(x)
+    return str(round(avg_tick_time, 2))
 
 
 app.layout = html.Div(children=[
     html.H1(children='Fight Control', style={'color': 'white'}),
     html.H2(children='General information', style={'color': 'white'}),
-    html.P(children=f'Tick speed: {str(data.get("tick_speed"))} | Avg. tick speed: {avg_tick_speed()}'),
-    html.P(children=f'Open angle: {data.get("open_angle")} | Close angle: {data.get("close_angle")}'),
+    html.P(children=f'Tick speed [ms]: {str(data.get("tick_speed"))} | Avg. tick calc speed [ms]: {avg_tick_speed()}'),
+    html.P(children=f'Open angle [°]: {data.get("open_angle")} | Close angle [°]: {data.get("close_angle")}'),
+    html.P(children=f'Start height [m]: {data.get("start_height")} | Deploy height [m]: {data.get("deploy_height")}'),
+    html.P(children=f'Wait time [s]: {data.get("wait_time")} | {"Timer activated" if data.get("timer_state") else "Timer deactivated"}'),
+    html.P(children=f'G threshold [g]: {data.get("g_threshold")}'),
     html.H2(children='Height', style={'color': 'white'}),
     dcc.Graph(
         id='graph',

@@ -6,7 +6,7 @@
 "deploy_height":2,
 "wait_time":5.00,
 "timer_state":1,
-"g_threshhold":6,
+"g_threshold":6,
 
 "flight_data":[
 {"tt":41.00,"h":2.04,"mh":2.04,"d":0,"s":1,"v":3.72,"gx":15.50,"gy":-5.59,"gz":3.79,"ax":8.15,"ay":1.19,"az":1.97},
