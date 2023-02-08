@@ -133,8 +133,30 @@ def acceleration_plot():
         template="plotly_dark")
 
 
+def avg_tick_speed():
+    global tick_data
+
+    tick_time = []
+
+    for i in tick_data:
+        tick_time.append(i["tt"])
+
+    avg_tick_time = (sum(tick_time)/len(tick_time))/1000
+
+    x = 1
+
+    while avg_tick_time < 1:
+        avg_tick_time *= 2
+        x += 1
+
+    return str(x)
+
+
 app.layout = html.Div(children=[
     html.H1(children='Fight Control', style={'color': 'white'}),
+    html.H2(children='General information', style={'color': 'white'}),
+    html.P(children=f'Tick speed: {str(data.get("tick_speed"))}'),
+    html.P(children=f'Avg. tick speed: {avg_tick_speed()}'),
     html.H2(children='Height', style={'color': 'white'}),
     dcc.Graph(
         id='graph',
@@ -160,6 +182,7 @@ app.layout = html.Div(children=[
         'backgroundColor': '#111111',
         'font-family': 'Arial',
         'textAlign': 'center',
+        'color': 'white',
     }
 )
 
