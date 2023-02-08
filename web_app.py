@@ -3,8 +3,7 @@ import plotly.express as px
 from utility import getData
 from pandas import DataFrame
 
-app = Dash(__name__,
-           external_stylesheets=['https://raw.githubusercontent.com/virus-rpi/SpaceInvador/main/assets/style.css'])
+app = Dash(__name__)
 
 data = getData("log1.txt")
 tick_data = data.get("flight_data")
@@ -114,8 +113,24 @@ def degrees_plot():
         gy.append(i["gy"])
         gz.append(i["gz"])
 
-    return px.line(DataFrame(data=DataFrame({'gx [°]': gx, 'gy [°]': gy, 'gz [°]': gz}))).update_layout(template="plotly_dark")
+    return px.line(DataFrame(data=DataFrame({'gx [°]': gx, 'gy [°]': gy, 'gz [°]': gz}))).update_layout(
+        template="plotly_dark")
 
+
+def acceleration_plot():
+    global tick_data
+
+    ax = []
+    ay = []
+    az = []
+
+    for i in tick_data:
+        ax.append(i["ax"])
+        ay.append(i["ay"])
+        az.append(i["az"])
+
+    return px.line(DataFrame(data=DataFrame({'ax [m/s^2]': ax, 'ay [m/s^2]': ay, 'az [m/s^2]': az}))).update_layout(
+        template="plotly_dark")
 
 
 app.layout = html.Div(children=[
@@ -134,6 +149,11 @@ app.layout = html.Div(children=[
     dcc.Graph(
         id='graph',
         figure=degrees_plot()
+    ),
+    html.H2(children='Acceleration', style={'color': 'white'}),
+    dcc.Graph(
+        id='graph',
+        figure=acceleration_plot()
     )
 ],
     style={
