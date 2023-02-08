@@ -155,8 +155,8 @@ def avg_tick_speed():
 app.layout = html.Div(children=[
     html.H1(children='Fight Control', style={'color': 'white'}),
     html.H2(children='General information', style={'color': 'white'}),
-    html.P(children=f'Tick speed: {str(data.get("tick_speed"))}'),
-    html.P(children=f'Avg. tick speed: {avg_tick_speed()}'),
+    html.P(children=f'Tick speed: {str(data.get("tick_speed"))} | Avg. tick speed: {avg_tick_speed()}'),
+    html.P(children=f'Open angle: {data.get("open_angle")} | Close angle: {data.get("close_angle")}'),
     html.H2(children='Height', style={'color': 'white'}),
     dcc.Graph(
         id='graph',
