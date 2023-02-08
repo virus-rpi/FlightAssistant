@@ -3,7 +3,8 @@ import plotly.express as px
 from utility import getData
 from pandas import DataFrame
 
-app = Dash(__name__)
+app = Dash(__name__,
+           external_stylesheets=['https://raw.githubusercontent.com/virus-rpi/SpaceInvador/main/assets/style.css'])
 
 data = getData("log1.txt")
 tick_data = data.get("flight_data")
@@ -32,11 +33,7 @@ def height_plot():
         if j["s"] == 2:
             descent_ticks.append(i)
 
-    d = DataFrame({'Height': heights})
-
-    df = DataFrame(data=d)
-
-    fig = px.line(df)
+    fig = px.line(DataFrame(data=DataFrame({'Height [m]': heights})))
     if len(deployed_ticks) > 0:
         fig.add_shape(
             type="rect",
@@ -45,7 +42,7 @@ def height_plot():
             y0=min(heights),
             y1=max(heights),
             fillcolor="green" if min(deployed_ticks) > 10 else "red",
-            opacity=0.2,
+            opacity=0.9,
         )
     if len(ground_ticks) > 0:
         fig.add_shape(
@@ -55,7 +52,7 @@ def height_plot():
             y0=min(heights),
             y1=max(heights) / 4,
             fillcolor="gray",
-            opacity=0.2,
+            opacity=0.9,
         )
     if len(ascent_ticks) > 0:
         fig.add_shape(
@@ -65,7 +62,7 @@ def height_plot():
             y0=min(heights),
             y1=max(heights) / 4,
             fillcolor="blue",
-            opacity=0.2,
+            opacity=0.9,
         )
     if len(descent_ticks) > 0:
         fig.add_shape(
@@ -75,21 +72,76 @@ def height_plot():
             y0=min(heights),
             y1=max(heights) / 4,
             fillcolor="pink",
-            opacity=0.2,
+            opacity=0.9,
         )
     fig.update_layout(template="plotly_dark")
     return fig
 
 
+def current_plot():
+    global tick_data
+
+    currents = []
+    for i in tick_data:
+        currents.append(i["v"])
+
+    fig = px.line(DataFrame(data=DataFrame({'Currents [v]': currents})))
+
+    fig.add_shape(
+        type="rect",
+        x0=0,
+        x1=len(tick_data),
+        y0=3,
+        y1=4.2,
+        fillcolor="green",
+        opacity=0.5,
+    )
+
+    fig.update_layout(template="plotly_dark")
+
+    return fig
+
+
+def degrees_plot():
+    global tick_data
+
+    gx = []
+    gy = []
+    gz = []
+
+    for i in tick_data:
+        gx.append(i["gx"])
+        gy.append(i["gy"])
+        gz.append(i["gz"])
+
+    return px.line(DataFrame(data=DataFrame({'gx [°]': gx, 'gy [°]': gy, 'gz [°]': gz}))).update_layout(template="plotly_dark")
+
+
+
 app.layout = html.Div(children=[
-    html.H1(children='Fight Control'),
-    html.H2(children='Height'),
+    html.H1(children='Fight Control', style={'color': 'white'}),
+    html.H2(children='Height', style={'color': 'white'}),
     dcc.Graph(
         id='graph',
         figure=height_plot()
     ),
-    html.H2(children='Current')
-])
+    html.H2(children='Current', style={'color': 'white'}),
+    dcc.Graph(
+        id='graph',
+        figure=current_plot()
+    ),
+    html.H2(children='Rotation', style={'color': 'white'}),
+    dcc.Graph(
+        id='graph',
+        figure=degrees_plot()
+    )
+],
+    style={
+        'backgroundColor': '#111111',
+        'font-family': 'Arial',
+        'textAlign': 'center',
+    }
+)
 
 if __name__ == '__main__':
     app.run_server(debug=True)
