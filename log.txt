@@ -1,0 +1,13 @@
+{
+"tick_speed":0,
+"open_angle":0,
+"close_angle":0,
+"start_height":0,
+"deploy_height":0,
+"wait_time":0,
+"timer_state":0,
+"g_threshold":0,
+
+"flight_data":[
+{"tt":0,"h":0,"mh":0,"d":0,"s":0,"v":0,"gx":0,"gy":0,"gz":0,"ax":0,"ay":0,"az":0}
+]}
