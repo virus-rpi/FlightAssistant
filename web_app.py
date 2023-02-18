@@ -135,6 +135,39 @@ def acceleration_plot():
         template="plotly_dark")
 
 
+def velocity_plot():
+    global tick_data
+
+    ax = []
+    ay = []
+    az = []
+
+    for i in tick_data:
+        ax.append(i["ax"])
+        ay.append(i["ay"])
+        az.append(i["az"])
+
+    velocity_x = 0
+    velocity_list_x = []
+    for i in ax:
+        velocity_list_x.append(velocity_x)
+        velocity_x += i
+    velocity_y = 0
+    velocity_list_y = []
+    for i in ay:
+        velocity_list_y.append(velocity_y)
+        velocity_y += i
+    velocity_z = 0
+    velocity_list_z = []
+    for i in az:
+        velocity_list_z.append(velocity_z)
+        velocity_z += i
+
+    return px.line(DataFrame(
+        data={'vx [m/s]': velocity_list_x, 'vy [m/s]': velocity_list_y, 'vz [m/s]': velocity_list_z})).update_layout(
+        template="plotly_dark")
+
+
 def avg_tick_speed():
     global tick_data
 
@@ -180,6 +213,11 @@ app.layout = html.Div(children=[
     dcc.Graph(
         id='acceleration_graph',
         figure=acceleration_plot()
+    ),
+    html.H2(children='Velocity', style={'color': 'white'}),
+    dcc.Graph(
+        id='velocity_graph',
+        figure=velocity_plot()
     ),
     dcc.Upload(
         id='upload-data',
@@ -283,6 +321,11 @@ def update(_):
 @app.callback(Output('acceleration_graph', 'figure'), Input('upload-data', 'contents'))
 def update(_):
     return acceleration_plot()
+
+
+@app.callback(Output('velocity_graph', 'figure'), Input('upload-data', 'contents'))
+def update(_):
+    return velocity_plot()
 
 
 if __name__ == '__main__':
