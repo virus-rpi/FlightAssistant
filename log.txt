@@ -1,5 +1,5 @@
 {
-"tick_speed":0,
+"tick_speed":1,
 "open_angle":0,
 "close_angle":0,
 "start_height":0,

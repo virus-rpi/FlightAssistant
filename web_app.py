@@ -137,34 +137,26 @@ def acceleration_plot():
 
 def velocity_plot():
     global tick_data
+    global data
 
-    ax = []
-    ay = []
-    az = []
-
+    heights = []
     for i in tick_data:
-        ax.append(i["ax"])
-        ay.append(i["ay"])
-        az.append(i["az"])
+        heights.append(i["h"])
 
-    velocity_x = 0
-    velocity_list_x = []
-    for i in ax:
-        velocity_list_x.append(velocity_x)
-        velocity_x += i
-    velocity_y = 0
-    velocity_list_y = []
-    for i in ay:
-        velocity_list_y.append(velocity_y)
-        velocity_y += i
-    velocity_z = 0
-    velocity_list_z = []
-    for i in az:
-        velocity_list_z.append(velocity_z)
-        velocity_z += i
+    velocity_list = []
+    v = 0
+    for j, i in enumerate(heights):
+        try:
+            velocity_list.append(v) if v != 0 else velocity_list.append(velocity_list[-1])
+        except IndexError:
+            pass
+        try:
+            v = (heights[j+50] - i) / ((data.get("tick_speed")*50)/1000)
+        except IndexError:
+            v = 0
 
     return px.line(DataFrame(
-        data={'vx [m/s]': velocity_list_x, 'vy [m/s]': velocity_list_y, 'vz [m/s]': velocity_list_z})).update_layout(
+        data={'velocity [m/s]': velocity_list})).update_layout(
         template="plotly_dark")
 
 
