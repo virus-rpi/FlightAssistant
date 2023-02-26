@@ -4,19 +4,24 @@ from utility import getData
 from pandas import DataFrame
 import base64
 from dash.dependencies import Input, Output, State
+from numpy import convolve, ones
 
 app = Dash(__name__)
 
 data = getData("log.txt", None)
 tick_data = data.get("flight_data")
+span = 20
 
 
 def height_plot():
     global tick_data
+    global span
 
     heights = []
     for i in tick_data:
         heights.append(i["h"])
+    heights = convolve(heights, ones(span * 2 + 1) / (span * 2 + 1), mode="same")
+
     deployed_ticks = []
     for i, j in enumerate(tick_data):
         if j["d"] == "1":
@@ -138,22 +143,24 @@ def acceleration_plot():
 def velocity_plot():
     global tick_data
     global data
+    global span
 
     heights = []
     for i in tick_data:
         heights.append(i["h"])
+    heights = convolve(heights, ones(span * 2 + 1) / (span * 2 + 1), mode="same")
 
     velocity_list = []
     v = 0
     for j, i in enumerate(heights):
+        velocity_list.append(v)
         try:
-            velocity_list.append(v) if v != 0 else velocity_list.append(velocity_list[-1])
+            v = (heights[j+1] - i) / (data.get("tick_speed")/1000)
         except IndexError:
-            pass
-        try:
-            v = (heights[j+50] - i) / ((data.get("tick_speed")*50)/1000)
-        except IndexError:
-            v = 0
+            v = velocity_list[-1]
+
+    spanV = 10
+    velocity_list = convolve(velocity_list, ones(spanV * 2 + 1) / (spanV * 2 + 1), mode="same")
 
     return px.line(DataFrame(
         data={'velocity [m/s]': velocity_list})).update_layout(
