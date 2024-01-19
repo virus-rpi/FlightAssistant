@@ -1,9 +1,11 @@
-from enum import Enum
-from dash import Dash, html, dcc
-from util import get_data, parse_contents
-from dash.dependencies import Input, Output, State
-from components import height_plot, current_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
 import functools
+from enum import Enum
+
+from dash import Dash, html, dcc
+from dash.dependencies import Input, Output, State, ClientsideFunction
+
+from components import height_plot, current_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
+from util import get_data, parse_contents
 
 
 class ContentMode(Enum):
@@ -14,8 +16,14 @@ class ContentMode(Enum):
 class WebApp:
     def __init__(self):
         external_stylesheets = ['/assets/style.css']
+        external_scripts = [
+            "https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js",
+            "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js",
+            "/assets/simulation.js",
+            "/assets/script.js"
+        ]
 
-        self.app = Dash(assets_folder='assets', external_stylesheets=external_stylesheets)
+        self.app = Dash(assets_folder='assets', external_stylesheets=external_stylesheets, external_scripts=external_scripts)
         self.app.title = "Flight Control"
 
         self.data = get_data("log.txt", None)
@@ -144,23 +152,23 @@ class WebApp:
         ]
 
         simulation = [
-            html.H2(children='Simulation', style={'width': '100%', 'text-align': 'center'}),
-            html.Div(id="simulation_container")
+            html.H2(children='Simulation', style={'width': '100%', 'textAlign': 'center'}),
+            html.Div(id="simulation_container"),
         ]
 
         self.app.layout = html.Div(children=[
-            html.H1(children='Fight Control', style={'width': '100%', 'text-align': 'center'}),
+            html.H1(children='Fight Control', style={'width': '100%', 'textAlign': 'center'}),
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
                     'Drag and Drop or ',
-                    html.A('select log file')
+                    html.A('select log file'),
                 ]),
                 className="upload",
                 accept='.json,.txt',
                 multiple=False
             ),
-            html.P(id='output-data-upload'),
+            html.P(id='output-data-upload', className="upload_output"),
             dcc.Tabs(id='tab_bar', value='graphs', parent_className='tab_bar', children=[
                 dcc.Tab(label='Graphs', value='graphs', className="tab"),
                 dcc.Tab(label='Simulation', value='simulation', className="tab"),
@@ -173,8 +181,14 @@ class WebApp:
                     html.Div(simulation, className="content_wrapper"),
                     className="simulation", id="simulation"),
             ], className="content_container"
-            )
-        ])
+            ),
+        ], id="vanta-container", className="vanta-container")
+
+        self.app.clientside_callback(
+            ClientsideFunction(namespace="clientside", function_name="attach_vanta"),
+            Output("vanta-container", "id"),
+            [Input("vanta-container", "id")],
+        )
 
         self.app.run_server(debug=True, host="localhost")
 
