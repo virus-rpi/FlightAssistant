@@ -68,3 +68,9 @@ G.idea/sonarlint/issuestore/d/8/d8660f08de1bc88139dd54df6000daeed895166c,d\6\d6
 components.py,2\3\23d100f2fdc84608e1d88a644a0db8b0c2f471c7
 7
 util.py,1\7\17c987dbb487ec852f3199b54e8bcdd5916bcf93
+D
+assets/simulation.js,1\f\1f9ef81e4d6a0c91d13e9814be10fa5f719ec9ab
+<
+package.json,7\0\7030d0b2f71b999ff89a343de08c414af32fc93a
+A
+package-lock.json,f\a\fa288d1472d29beccb489a676f68739ad365fc47
