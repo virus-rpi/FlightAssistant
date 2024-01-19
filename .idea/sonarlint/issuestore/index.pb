@@ -62,3 +62,5 @@ w
 G.idea/sonarlint/issuestore/0/f/0f947a4b53e60a5a036e59dbe19a61a7c7892e29,4\4\44e1561cbb19bd7ffca2cccc1e5bb7cfeef28d20
 w
 G.idea/sonarlint/issuestore/d/8/d8660f08de1bc88139dd54df6000daeed895166c,d\6\d65c44369e9ef679824b4a9f81a6dd0a87ce76f5
+@
+assets/style.css,5\0\50d983db3c46465e37c94b0c2ae789b31d18f9ac

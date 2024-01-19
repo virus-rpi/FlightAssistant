@@ -178,7 +178,10 @@ def parse_contents(contents, filename):
 
 class WebApp:
     def __init__(self):
-        self.app = Dash(__name__)
+        external_stylesheets = ['/assets/style.css']
+
+        self.app = Dash(assets_folder='assets', external_stylesheets=external_stylesheets)
+        self.app.title = "Flight Control"
 
         self.data = get_data("log.txt", None)
         self.tick_data = self.data.get("flight_data")
@@ -236,7 +239,18 @@ class WebApp:
             return velocity_plot(self.tick_data, self.data, self.span)
 
         self.app.layout = html.Div(children=[
-            html.H1(children='Fight Control', style={'color': 'white'}),
+            html.H1(children='Fight Control'),
+            dcc.Upload(
+                id='upload-data',
+                children=html.Div([
+                    'Drag and Drop or ',
+                    html.A('Select Files')
+                ]),
+                className="upload",
+                accept='.json,.txt',
+                multiple=False
+            ),
+            html.P(id='output-data-upload'),
             html.H2(children='General information', style={'color': 'white'}),
             html.P(
                 children=f'Tick speed [ms]: {str(self.data.get("tick_speed"))} | Avg. tick calc speed [ms]: {avg_tick_speed(self.tick_data)}',
@@ -275,33 +289,7 @@ class WebApp:
                 id='velocity_graph',
                 figure=velocity_plot(self.tick_data, self.data, self.span)
             ),
-            dcc.Upload(
-                id='upload-data',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files')
-                ]),
-                style={
-                    'width': '100%',
-                    'height': '60px',
-                    'lineHeight': '60px',
-                    'borderWidth': '1px',
-                    'borderStyle': 'dashed',
-                    'borderRadius': '5px',
-                    'textAlign': 'center',
-                    'margin': '10px'
-                },
-                multiple=False
-            ),
-            html.P(id='output-data-upload'),
-        ],
-            style={
-                'backgroundColor': '#111111',
-                'font-family': 'Arial',
-                'textAlign': 'center',
-                'color': 'white',
-            }
-        )
+        ])
 
         self.app.run_server(debug=True, host="localhost")
 

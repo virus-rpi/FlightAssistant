@@ -1,0 +1,19 @@
+body {
+    background-color: #111111;
+    font-family: 'Arial', rounded, sans-serif;
+    text-align: center;
+    color: white;
+    margin: 0;
+}
+
+.upload {
+    width: 20%;
+    height: 60px;
+    line-height: 60px;
+    border-width: 1px;
+    border-style: dashed;
+    border-radius: 5px;
+    text-align: center;
+    margin: 10px;
+    display: inline-block;
+}
