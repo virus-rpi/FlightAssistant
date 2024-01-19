@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 log.json
-
+.idea/
+.idea
+.idea/*
