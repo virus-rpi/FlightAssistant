@@ -64,3 +64,7 @@ w
 G.idea/sonarlint/issuestore/d/8/d8660f08de1bc88139dd54df6000daeed895166c,d\6\d65c44369e9ef679824b4a9f81a6dd0a87ce76f5
 @
 assets/style.css,5\0\50d983db3c46465e37c94b0c2ae789b31d18f9ac
+=
+components.py,2\3\23d100f2fdc84608e1d88a644a0db8b0c2f471c7
+7
+util.py,1\7\17c987dbb487ec852f3199b54e8bcdd5916bcf93
