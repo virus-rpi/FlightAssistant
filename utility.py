@@ -1,7 +1,7 @@
 import json
 
 
-class getData:
+class get_data:
     def __init__(self, path: str, dictionary) -> None:
         if dictionary is None:
             with open(path, 'rb') as f:
@@ -12,8 +12,3 @@ class getData:
 
     def get(self, key: str):
         return self.data[key]
-
-
-if __name__ == '__main__':
-    data = getData("log.txt", None)
-    print("Test 1: Pass" if data.get("tick_speed") == 20 else "Test 2: Fail")

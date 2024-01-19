@@ -1,22 +1,13 @@
 from dash import Dash, html, dcc
 import plotly.express as px
-from utility import getData
+from utility import get_data
 from pandas import DataFrame
 import base64
 from dash.dependencies import Input, Output, State
 from numpy import convolve, ones
 
-app = Dash(__name__)
 
-data = getData("log.txt", None)
-tick_data = data.get("flight_data")
-span = 20
-
-
-def height_plot():
-    global tick_data
-    global span
-
+def height_plot(tick_data, span):
     heights = []
     for i in tick_data:
         heights.append(i["h"])
@@ -84,9 +75,7 @@ def height_plot():
     return fig
 
 
-def current_plot():
-    global tick_data
-
+def current_plot(tick_data):
     currents = []
     for i in tick_data:
         currents.append(i["v"])
@@ -108,9 +97,7 @@ def current_plot():
     return fig
 
 
-def degrees_plot():
-    global tick_data
-
+def degrees_plot(tick_data):
     gx = []
     gy = []
     gz = []
@@ -124,9 +111,7 @@ def degrees_plot():
         template="plotly_dark")
 
 
-def acceleration_plot():
-    global tick_data
-
+def acceleration_plot(tick_data):
     ax = []
     ay = []
     az = []
@@ -140,11 +125,7 @@ def acceleration_plot():
         template="plotly_dark")
 
 
-def velocity_plot():
-    global tick_data
-    global data
-    global span
-
+def velocity_plot(tick_data, data, span):
     heights = []
     for i in tick_data:
         heights.append(i["h"])
@@ -155,21 +136,19 @@ def velocity_plot():
     for j, i in enumerate(heights):
         velocity_list.append(v)
         try:
-            v = (heights[j+1] - i) / (data.get("tick_speed")/1000)
+            v = (heights[j + 1] - i) / (data.get("tick_speed") / 1000)
         except IndexError:
             v = velocity_list[-1]
 
-    spanV = 10
-    velocity_list = convolve(velocity_list, ones(spanV * 2 + 1) / (spanV * 2 + 1), mode="same")
+    span_velocity = 10
+    velocity_list = convolve(velocity_list, ones(span_velocity * 2 + 1) / (span_velocity * 2 + 1), mode="same")
 
     return px.line(DataFrame(
         data={'velocity [m/s]': velocity_list})).update_layout(
         template="plotly_dark")
 
 
-def avg_tick_speed():
-    global tick_data
-
+def avg_tick_speed(tick_data):
     tick_time = []
 
     for i in tick_data:
@@ -180,81 +159,13 @@ def avg_tick_speed():
     return str(round(avg_tick_time, 2))
 
 
-app.layout = html.Div(children=[
-    html.H1(children='Fight Control', style={'color': 'white'}),
-    html.H2(children='General information', style={'color': 'white'}),
-    html.P(children=f'Tick speed [ms]: {str(data.get("tick_speed"))} | Avg. tick calc speed [ms]: {avg_tick_speed()}',
-           id="tick"),
-    html.P(children=f'Open angle [°]: {data.get("open_angle")} | Close angle [°]: {data.get("close_angle")}',
-           id="angle"),
-    html.P(children=f'Start height [m]: {data.get("start_height")} | Deploy height [m]: {data.get("deploy_height")}',
-           id="height"),
-    html.P(
-        children=f'Wait time [s]: {data.get("wait_time")} | {"Timer activated" if data.get("timer_state") else "Timer deactivated"}',
-        id="time"),
-    html.P(children=f'G threshold [g]: {data.get("g_threshold")}', id="top_g"),
-    html.H2(children='Height', style={'color': 'white'}),
-    dcc.Graph(
-        id='height_graph',
-        figure=height_plot()
-    ),
-    html.H2(children='Current', style={'color': 'white'}),
-    dcc.Graph(
-        id='current_graph',
-        figure=current_plot()
-    ),
-    html.H2(children='Rotation', style={'color': 'white'}),
-    dcc.Graph(
-        id='rot_graph',
-        figure=degrees_plot()
-    ),
-    html.H2(children='Acceleration', style={'color': 'white'}),
-    dcc.Graph(
-        id='acceleration_graph',
-        figure=acceleration_plot()
-    ),
-    html.H2(children='Velocity', style={'color': 'white'}),
-    dcc.Graph(
-        id='velocity_graph',
-        figure=velocity_plot()
-    ),
-    dcc.Upload(
-        id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
-        ]),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-        multiple=False
-    ),
-    html.P(id='output-data-upload'),
-],
-    style={
-        'backgroundColor': '#111111',
-        'font-family': 'Arial',
-        'textAlign': 'center',
-        'color': 'white',
-    }
-)
-
-
 def parse_contents(contents, filename):
-    global data, tick_data
     content_string = contents.split(',')
 
     content = str(base64.b64decode(content_string[1].encode('utf-8')).decode('utf-8'))
 
     try:
-        data = getData("", content)
+        data = get_data("", content)
         tick_data = data.get("flight_data")
     except Exception as e:
         print(e)
@@ -264,68 +175,138 @@ def parse_contents(contents, filename):
 
     return html.Div([
         html.P(filename),
-    ])
+    ]), data, tick_data
 
 
-@app.callback(Output('output-data-upload', 'children'),
-              Input('upload-data', 'contents'),
-              State('upload-data', 'filename')
-              )
-def update_output(list_of_contents, list_of_names):
-    if list_of_contents is not None:
-        children = [parse_contents(list_of_contents, list_of_names)]
-        return children
+class WebApp:
+    def __init__(self):
+        self.app = Dash(__name__)
 
+        self.data = get_data("log.txt", None)
+        self.tick_data = self.data.get("flight_data")
+        self.span = 20
 
-@app.callback(Output('tick', 'children'), Input('upload-data', 'contents'), )
-def update(_):
-    return f'Tick speed [ms]: {str(data.get("tick_speed"))} | Avg. tick calc speed [ms]: {avg_tick_speed()}'
+    def run(self):
+        @self.app.callback(Output('output-data-upload', 'children'),
+                           Input('upload-data', 'contents'),
+                           State('upload-data', 'filename'),
+                           )
+        def update_output(list_of_contents, list_of_names):
+            if list_of_contents is not None:
+                divs, self.data, self.tick_data = parse_contents(list_of_contents, list_of_names)
+                children = [divs]
+                return children
 
+        @self.app.callback(Output('tick', 'children'), Input('upload-data', 'contents'), )
+        def update(_):
+            return f'Tick speed [ms]: {str(self.data.get("tick_speed"))} | Avg. tick calc speed [ms]: {avg_tick_speed(self.tick_data)}'
 
-@app.callback(Output('angle', 'children'), Input('upload-data', 'contents'))
-def update(_):
-    return f'Open angle [°]: {data.get("open_angle")} | Close angle [°]: {data.get("close_angle")}'
+        @self.app.callback(Output('angle', 'children'), Input('upload-data', 'contents'))
+        def update(_):
+            return f'Open angle [°]: {self.data.get("open_angle")} | Close angle [°]: {self.data.get("close_angle")}'
 
+        @self.app.callback(Output('height', 'children'), Input('upload-data', 'contents'))
+        def update(_):
+            return f'Start height [m]: {self.data.get("start_height")} | Deploy height [m]: {self.data.get("deploy_height")}'
 
-@app.callback(Output('height', 'children'), Input('upload-data', 'contents'))
-def update(_):
-    return f'Start height [m]: {data.get("start_height")} | Deploy height [m]: {data.get("deploy_height")}'
+        @self.app.callback(Output('time', 'children'), Input('upload-data', 'contents'))
+        def update(_):
+            return f'Wait time [s]: {self.data.get("wait_time")} | {"Timer activated" if self.data.get("timer_state") else "Timer deactivated"}'
 
+        @self.app.callback(Output('top_g', 'children'), Input('upload-data', 'contents'))
+        def update(_):
+            return f'G threshold [g]: {self.data.get("g_threshold")}'
 
-@app.callback(Output('time', 'children'), Input('upload-data', 'contents'))
-def update(_):
-    return f'Wait time [s]: {data.get("wait_time")} | {"Timer activated" if data.get("timer_state") else "Timer deactivated"}'
+        @self.app.callback(Output('height_graph', 'figure'), Input('upload-data', 'contents'))
+        def update(_):
+            return height_plot(self.tick_data, self.span)
 
+        @self.app.callback(Output('current_graph', 'figure'), Input('upload-data', 'contents'))
+        def update(_):
+            return current_plot(self.tick_data)
 
-@app.callback(Output('top_g', 'children'), Input('upload-data', 'contents'))
-def update(_):
-    return f'G threshold [g]: {data.get("g_threshold")}'
+        @self.app.callback(Output('rot_graph', 'figure'), Input('upload-data', 'contents'))
+        def update(_):
+            return degrees_plot(self.tick_data)
 
+        @self.app.callback(Output('acceleration_graph', 'figure'), Input('upload-data', 'contents'))
+        def update(_):
+            return acceleration_plot(self.tick_data)
 
-@app.callback(Output('height_graph', 'figure'), Input('upload-data', 'contents'))
-def update(_):
-    return height_plot()
+        @self.app.callback(Output('velocity_graph', 'figure'), Input('upload-data', 'contents'))
+        def update(_):
+            return velocity_plot(self.tick_data, self.data, self.span)
 
+        self.app.layout = html.Div(children=[
+            html.H1(children='Fight Control', style={'color': 'white'}),
+            html.H2(children='General information', style={'color': 'white'}),
+            html.P(
+                children=f'Tick speed [ms]: {str(self.data.get("tick_speed"))} | Avg. tick calc speed [ms]: {avg_tick_speed(self.tick_data)}',
+                id="tick"),
+            html.P(children=f'Open angle [°]: {self.data.get("open_angle")} | Close angle [°]: {self.data.get("close_angle")}',
+                   id="angle"),
+            html.P(
+                children=f'Start height [m]: {self.data.get("start_height")} | Deploy height [m]: {self.data.get("deploy_height")}',
+                id="height"),
+            html.P(
+                children=f'Wait time [s]: {self.data.get("wait_time")} | {"Timer activated" if self.data.get("timer_state") else "Timer deactivated"}',
+                id="time"),
+            html.P(children=f'G threshold [g]: {self.data.get("g_threshold")}', id="top_g"),
+            html.H2(children='Height', style={'color': 'white'}),
+            dcc.Graph(
+                id='height_graph',
+                figure=height_plot(self.tick_data, self.span)
+            ),
+            html.H2(children='Current', style={'color': 'white'}),
+            dcc.Graph(
+                id='current_graph',
+                figure=current_plot(self.tick_data)
+            ),
+            html.H2(children='Rotation', style={'color': 'white'}),
+            dcc.Graph(
+                id='rot_graph',
+                figure=degrees_plot(self.tick_data)
+            ),
+            html.H2(children='Acceleration', style={'color': 'white'}),
+            dcc.Graph(
+                id='acceleration_graph',
+                figure=acceleration_plot(self.tick_data)
+            ),
+            html.H2(children='Velocity', style={'color': 'white'}),
+            dcc.Graph(
+                id='velocity_graph',
+                figure=velocity_plot(self.tick_data, self.data, self.span)
+            ),
+            dcc.Upload(
+                id='upload-data',
+                children=html.Div([
+                    'Drag and Drop or ',
+                    html.A('Select Files')
+                ]),
+                style={
+                    'width': '100%',
+                    'height': '60px',
+                    'lineHeight': '60px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                    'textAlign': 'center',
+                    'margin': '10px'
+                },
+                multiple=False
+            ),
+            html.P(id='output-data-upload'),
+        ],
+            style={
+                'backgroundColor': '#111111',
+                'font-family': 'Arial',
+                'textAlign': 'center',
+                'color': 'white',
+            }
+        )
 
-@app.callback(Output('current_graph', 'figure'), Input('upload-data', 'contents'))
-def update(_):
-    return current_plot()
-
-
-@app.callback(Output('rot_graph', 'figure'), Input('upload-data', 'contents'))
-def update(_):
-    return degrees_plot()
-
-
-@app.callback(Output('acceleration_graph', 'figure'), Input('upload-data', 'contents'))
-def update(_):
-    return acceleration_plot()
-
-
-@app.callback(Output('velocity_graph', 'figure'), Input('upload-data', 'contents'))
-def update(_):
-    return velocity_plot()
+        self.app.run_server(debug=True, host="localhost")
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host="localhost")
+    WebApp().run()
