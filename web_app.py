@@ -8,68 +8,66 @@ from numpy import convolve, ones
 
 
 def height_plot(tick_data, span):
-    heights = []
-    for i in tick_data:
-        heights.append(i["h"])
+    heights = [i['h'] for i in tick_data]
     heights = convolve(heights, ones(span * 2 + 1) / (span * 2 + 1), mode="same")
 
-    deployed_ticks = []
-    for i, j in enumerate(tick_data):
-        if j["d"] == "1":
-            deployed_ticks.append(i)
-    ground_ticks = []
-    for i, j in enumerate(tick_data):
-        if j["s"] == 0:
-            ground_ticks.append(i)
-    ascent_ticks = []
-    for i, j in enumerate(tick_data):
-        if j["s"] == 1:
-            ascent_ticks.append(i)
-    descent_ticks = []
-    for i, j in enumerate(tick_data):
-        if j["s"] == 2:
-            descent_ticks.append(i)
+    deployed_ticks = [i for i, j in enumerate(tick_data) if j["d"] == "1"]
+    ground_ticks = [i for i, j in enumerate(tick_data) if j["s"] == 0]
+    ascent_ticks = [i for i, j in enumerate(tick_data) if j["s"] == 1]
+    descent_ticks = [i for i, j in enumerate(tick_data) if j["s"] == 2]
 
     fig = px.line(DataFrame(data=DataFrame({'Height [m]': heights})))
-    if len(deployed_ticks) > 0:
+
+    OPACITY = 0.3
+    Y1_FACTOR = 4
+
+    if deployed_ticks:
+        min_deployed_ticks = min(deployed_ticks)
+        max_deployed_ticks = max(deployed_ticks)
         fig.add_shape(
             type="rect",
-            x0=min(deployed_ticks),
-            x1=max(deployed_ticks),
+            x0=min_deployed_ticks,
+            x1=max_deployed_ticks,
             y0=min(heights),
             y1=max(heights),
-            fillcolor="green" if min(deployed_ticks) > 10 else "red",
-            opacity=0.3,
+            fillcolor="green" if min_deployed_ticks > 10 else "red",
+            opacity=OPACITY,
         )
-    if len(ground_ticks) > 0:
+    if ground_ticks:
+        min_ground_ticks = min(ground_ticks)
+        max_ground_ticks = max(ground_ticks)
         fig.add_shape(
             type="rect",
-            x0=min(ground_ticks),
-            x1=max(ground_ticks),
+            x0=min_ground_ticks,
+            x1=max_ground_ticks,
             y0=min(heights),
-            y1=max(heights) / 4,
+            y1=max(heights) / Y1_FACTOR,
             fillcolor="gray",
-            opacity=0.3,
+            opacity=OPACITY,
         )
-    if len(ascent_ticks) > 0:
+    if ascent_ticks:
+        min_ascent_ticks = min(ascent_ticks)
+        max_ascent_ticks = max(ascent_ticks)
         fig.add_shape(
             type="rect",
-            x0=min(ascent_ticks),
-            x1=max(ascent_ticks),
+            x0=min_ascent_ticks,
+            x1=max_ascent_ticks,
             y0=min(heights),
-            y1=max(heights) / 4,
+            y1=max(heights) / Y1_FACTOR,
             fillcolor="blue",
-            opacity=0.3,
+            opacity=OPACITY,
         )
-    if len(descent_ticks) > 0:
+    if descent_ticks:
+        min_descent_ticks = min(descent_ticks)
+        max_descent_ticks = max(descent_ticks)
         fig.add_shape(
             type="rect",
-            x0=min(descent_ticks),
-            x1=max(descent_ticks),
+            x0=min_descent_ticks,
+            x1=max_descent_ticks,
             y0=min(heights),
-            y1=max(heights) / 4,
+            y1=max(heights) / Y1_FACTOR,
             fillcolor="yellow",
-            opacity=0.3,
+            opacity=OPACITY,
         )
     fig.update_layout(template="plotly_dark")
     return fig
