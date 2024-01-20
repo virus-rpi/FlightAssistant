@@ -10,7 +10,7 @@ window.dash_clientside.clientside = {
         mouseControls: true,
         touchControls: true,
         gyroControls: true,
-        minHeight: 500.00,
+        minHeight: 560.00,
         minWidth: 450.00,
         scale: 1.00,
         scaleMobile: 1.00,

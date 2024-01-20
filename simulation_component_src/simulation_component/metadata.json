@@ -7,8 +7,20 @@
         "description": "",
         "required": true,
         "type": {
-          "name": "object",
-          "raw": "object"
+          "name": "arrayOf",
+          "value": {
+            "name": "object",
+            "raw": "object"
+          },
+          "raw": "object[]"
+        }
+      },
+      "tick_speed": {
+        "description": "",
+        "required": true,
+        "type": {
+          "name": "number",
+          "raw": "number"
         }
       },
       "id": {

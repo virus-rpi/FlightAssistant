@@ -25,8 +25,9 @@ class WebApp:
                         external_scripts=external_scripts)
         self.app.title = "Flight Control"
 
-        self.data = get_data("log.txt", None)
+        self.data = get_data("real_log.json", None)
         self.tick_data = self.data.get("flight_data")
+        self.n_ticks = len(self.tick_data)
         self.span = 20
 
         self.mode = ContentMode.GRAPHS
@@ -40,6 +41,7 @@ class WebApp:
         def update_output(list_of_contents, list_of_names):
             if list_of_contents is not None:
                 divs, self.data, self.tick_data = parse_contents(list_of_contents, list_of_names)
+                self.n_ticks = len(self.tick_data)
                 children = [divs]
                 return children
 
@@ -152,11 +154,24 @@ class WebApp:
 
         simulation = [
             html.H2(children='Simulation', style={'width': '100%', 'textAlign': 'center'}),
-            simulation_component.SimulationComponent(self.tick_data)
+            dcc.Slider(
+                min=0,
+                max=self.n_ticks,
+                step=1,
+                value=0,
+                marks=None,
+                tooltip={"placement": "bottom", "always_visible": True},
+                id="simulation_range_slider",
+                className="simulation_range_slider"
+            ),
+            html.Div(id="simulation_container", children=[
+                simulation_component.SimulationComponent(tick_data=self.tick_data, tick_speed=self.data.get("tick_speed")),
+                html.P(id="simulation_current_tick", style={'display': 'none'}, children=0)
+            ]),
         ]
 
         self.app.layout = html.Div(children=[
-            html.H1(children='Fight Control', style={'width': '100%', 'textAlign': 'center'}),
+            html.H1(children='Flight Control', style={'width': '100%', 'textAlign': 'center'}),
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
