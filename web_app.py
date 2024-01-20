@@ -4,6 +4,7 @@ from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State, ClientsideFunction
 from components import height_plot, current_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
 from util import get_data, parse_contents
+import simulation_component
 
 
 class ContentMode(Enum):  # TODO: Add config editor mode and control mode
@@ -151,8 +152,7 @@ class WebApp:
 
         simulation = [
             html.H2(children='Simulation', style={'width': '100%', 'textAlign': 'center'}),
-            html.Div(id="simulation_container"),
-            html.Script(src="/assets/script.js"),
+            simulation_component.SimulationComponent(self.tick_data)
         ]
 
         self.app.layout = html.Div(children=[
