@@ -1,0 +1,2 @@
+recursive-include simulation_component/** *.js *.css *.json *.html
+prune tests

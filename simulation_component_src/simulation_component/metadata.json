@@ -1,0 +1,33 @@
+{
+  "src/ts/components/SimulationComponent.tsx": {
+    "displayName": "SimulationComponent",
+    "description": "",
+    "props": {
+      "tick_data": {
+        "description": "",
+        "required": true,
+        "type": {
+          "name": "object",
+          "raw": "object"
+        }
+      },
+      "id": {
+        "description": "Unique ID to identify this component in Dash callbacks.",
+        "required": false,
+        "type": {
+          "name": "string",
+          "raw": "string"
+        }
+      },
+      "setProps": {
+        "description": "Update props to trigger callbacks.",
+        "required": true,
+        "type": {
+          "name": "func",
+          "raw": "(props: Record<string, any>) => void"
+        }
+      }
+    },
+    "isContext": false
+  }
+}
