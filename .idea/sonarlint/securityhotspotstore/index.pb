@@ -2,9 +2,6 @@
 :
 
 web_app.py,3\f\3f6fe93eedfc5b96eb7d895ebbb4aa21d222996f
-:
-
-utility.py,2\7\27dacbc4a23b67728547914756cb0b05b1463b89
 7
 log.txt,8\9\89dbeb08d7aa865d748d706c1d17ee94f6f82ba7
 8
@@ -70,9 +67,9 @@ G.idea/sonarlint/issuestore/d/8/d8660f08de1bc88139dd54df6000daeed895166c,d\6\d6
 util.py,1\7\17c987dbb487ec852f3199b54e8bcdd5916bcf93
 D
 assets/simulation.js,1\f\1f9ef81e4d6a0c91d13e9814be10fa5f719ec9ab
-<
-package.json,7\0\7030d0b2f71b999ff89a343de08c414af32fc93a
-A
-package-lock.json,f\a\fa288d1472d29beccb489a676f68739ad365fc47
 @
 assets/script.js,d\7\d7524b2008b16bc0083c9a499d617e0edce9da53
+C
+assets/package.json,8\b\8b5f206fd041c105d9e1da9e29673006b7622228
+5
+links,3\7\379e75c850e1334ef7bece52694c2f26cebec78f

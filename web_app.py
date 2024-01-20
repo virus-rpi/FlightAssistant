@@ -1,14 +1,12 @@
 import functools
 from enum import Enum
-
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State, ClientsideFunction
-
 from components import height_plot, current_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
 from util import get_data, parse_contents
 
 
-class ContentMode(Enum):
+class ContentMode(Enum):  # TODO: Add config editor mode and control mode
     GRAPHS = "graphs"
     SIMULATION = "simulation"
 
@@ -19,11 +17,11 @@ class WebApp:
         external_scripts = [
             "https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js",
             "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js",
-            "/assets/simulation.js",
             "/assets/script.js"
         ]
 
-        self.app = Dash(assets_folder='assets', external_stylesheets=external_stylesheets, external_scripts=external_scripts)
+        self.app = Dash(assets_folder='assets', external_stylesheets=external_stylesheets,
+                        external_scripts=external_scripts)
         self.app.title = "Flight Control"
 
         self.data = get_data("log.txt", None)
@@ -154,6 +152,7 @@ class WebApp:
         simulation = [
             html.H2(children='Simulation', style={'width': '100%', 'textAlign': 'center'}),
             html.Div(id="simulation_container"),
+            html.Script(src="/assets/script.js"),
         ]
 
         self.app.layout = html.Div(children=[
