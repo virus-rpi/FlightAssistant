@@ -52,7 +52,7 @@ const SimulationComponent = (props: Props) => {
         let lastRotation = [];
         const maxRotationHistory = 5;
 
-        const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => { // TODO: smooth out the animation with moving average
+        const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => {
             const newPosition = tick_data[currentTick]["h"];
             lastPosition.push(newPosition);
             if (lastPosition.length > maxPositionHistory) {
@@ -62,7 +62,7 @@ const SimulationComponent = (props: Props) => {
             controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         };
 
-        const updateRocketRotation = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => {
+        const updateRocketRotation = (currentTick: number, rocket: THREE.Mesh) => {
             const newRotationX = (tick_data[currentTick]["gx"] * (Math.PI / 180)) + Math.PI / 2;
             const newRotationY = tick_data[currentTick]["gy"] * (Math.PI / 180);
             const newRotationZ = tick_data[currentTick]["gz"] * (Math.PI / 180);
@@ -85,8 +85,9 @@ const SimulationComponent = (props: Props) => {
             let currentTick = Math.floor(delta * tick_speed);
 
             if (currentTick < tick_data.length) {
-                updateRocketPosition(currentTick, rocket, controls); // TODO: add rotation and other axis through acceleration
-                updateRocketRotation(currentTick, rocket, controls);
+                updateRocketPosition(currentTick, rocket, controls);
+                updateRocketRotation(currentTick, rocket);
+                // TODO: add other axis through acceleration
                 // TODO: add a trail behind the rocket
                 // TODO: show a parachute when "d" is 1
                 // TODO: add a line to show the current altitude
