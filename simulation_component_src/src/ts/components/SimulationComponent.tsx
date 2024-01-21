@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, {useLayoutEffect, useRef} from 'react';
 import {DashComponentProps} from '../props';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -17,8 +17,9 @@ const SimulationComponent = (props: Props) => {
         while (containerRef.current.firstChild) {
             containerRef.current.removeChild(containerRef.current.firstChild);
         }
-
+        // TODO: add a button to jump to liftoff
         const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 5;
         camera.position.y = -15;
@@ -47,31 +48,24 @@ const SimulationComponent = (props: Props) => {
         controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         controls.update();
 
+        const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => { // TODO: smooth out the animation
+            rocket.position.z = tick_data[currentTick]["h"];
+            controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
+        };
 
         let startTime = new Date().getTime();
-        let currentTick = 0;
         const animate = function () {
-            // if (!document.getElementById("simulation-canvas")) {
-            //     cancelAnimationFrame(animationId);
-            //     return;
-            // }
-
             requestAnimationFrame(animate);
 
             const currentTime = new Date().getTime();
             const delta = (currentTime - startTime) / 1000;
-            currentTick = Math.floor(delta * tick_speed);
+            let currentTick = Math.floor(delta * tick_speed);
 
             if (currentTick < tick_data.length) {
                 console.log("currentTick", currentTick);
-                // rocket.rotation.z = tick_data[currentTick]["gz"];
-                // rocket.rotation.y = tick_data[currentTick]["gy"];
-                // rocket.rotation.x = tick_data[currentTick]["gx"];
-                rocket.position.z = tick_data[currentTick]["h"];
-                controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
+                updateRocketPosition(currentTick, rocket, controls); // TODO: add rotation and other axis through acceleration
             } else {
                 startTime = new Date().getTime();
-                currentTick = 0;
             }
             controls.update();
 

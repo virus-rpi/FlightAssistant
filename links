@@ -1,2 +1,4 @@
 https://dash.plotly.com/dash-daq For controls
 https://community.plotly.com/t/community-components-index/60098
+
+npm run build; ../python/Scripts/pip.exe install ../simulation_component_src
