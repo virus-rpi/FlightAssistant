@@ -20,6 +20,8 @@ const SimulationComponent = (props: Props) => {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+        camera.position.y = -15;
         const renderer = new THREE.WebGLRenderer();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -43,27 +45,28 @@ const SimulationComponent = (props: Props) => {
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableZoom = true;
         controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
-        controls.minPolarAngle = undefined;
-        controls.maxPolarAngle = undefined;
         controls.update();
 
 
         let startTime = new Date().getTime();
         let currentTick = 0;
-        let animationId = null;
         const animate = function () {
             // if (!document.getElementById("simulation-canvas")) {
             //     cancelAnimationFrame(animationId);
             //     return;
             // }
 
-            animationId = requestAnimationFrame(animate);
+            requestAnimationFrame(animate);
 
             const currentTime = new Date().getTime();
             const delta = (currentTime - startTime) / 1000;
             currentTick = Math.floor(delta * tick_speed);
 
             if (currentTick < tick_data.length) {
+                console.log("currentTick", currentTick);
+                // rocket.rotation.z = tick_data[currentTick]["gz"];
+                // rocket.rotation.y = tick_data[currentTick]["gy"];
+                // rocket.rotation.x = tick_data[currentTick]["gx"];
                 rocket.position.z = tick_data[currentTick]["h"];
                 controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
             } else {
@@ -79,12 +82,12 @@ const SimulationComponent = (props: Props) => {
 
         return () => {
             console.log("SimulationComponent unmounted");
-            if (animationId) cancelAnimationFrame(animationId);
+            // if (animationId) cancelAnimationFrame(animationId);
         }
     }, [tick_data, tick_speed]);
 
     return (
-        <div id={"simulation-canvas"} ref={containerRef} style={{width: "100%", height: "30% !important"}}/>
+        <div id={"simulation-canvas"} ref={containerRef} style={{width: "100%"}}/>
     )
 }
 
