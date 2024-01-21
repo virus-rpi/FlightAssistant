@@ -2,8 +2,6 @@ import React, {useLayoutEffect, useRef} from 'react';
 import {DashComponentProps} from '../props';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
-import {Simulate} from "react-dom/test-utils";
-import keyDown = Simulate.keyDown;
 
 type Props = {
     tick_data: object[],
@@ -19,12 +17,11 @@ const SimulationComponent = (props: Props) => {
         while (containerRef.current.firstChild) {
             containerRef.current.removeChild(containerRef.current.firstChild);
         }
-        // TODO: add a button to jump to liftoff (first tick where "s" is 1)
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x87CEEB);
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-        camera.position.y = -15;
+        camera.position.z = 10;
+        camera.position.y = -50;
         const renderer = new THREE.WebGLRenderer();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -50,8 +47,16 @@ const SimulationComponent = (props: Props) => {
         controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         controls.update();
 
+        let lastPosition = [];
+        const maxPositionHistory = 10;
+
         const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => { // TODO: smooth out the animation with moving average
-            rocket.position.z = tick_data[currentTick]["h"];
+            const newPosition = tick_data[currentTick]["h"];
+            lastPosition.push(newPosition);
+            if (lastPosition.length > maxPositionHistory) {
+                lastPosition.shift();
+            }
+            rocket.position.z = lastPosition.reduce((a, b) => a + b, 0) / lastPosition.length;
             controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         };
 
@@ -67,6 +72,7 @@ const SimulationComponent = (props: Props) => {
                 updateRocketPosition(currentTick, rocket, controls); // TODO: add rotation and other axis through acceleration
                 // TODO: add a trail behind the rocket
                 // TODO: show a parachute when "d" is 1
+                // TODO: add a line to show the current altitude
             } else {
                 startTime = new Date().getTime();
             }
