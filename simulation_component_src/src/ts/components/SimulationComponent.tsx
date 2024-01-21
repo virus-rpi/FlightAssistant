@@ -49,6 +49,8 @@ const SimulationComponent = (props: Props) => {
 
         let lastPosition = [];
         const maxPositionHistory = 10;
+        let lastRotation = [];
+        const maxRotationHistory = 5;
 
         const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => { // TODO: smooth out the animation with moving average
             const newPosition = tick_data[currentTick]["h"];
@@ -60,6 +62,20 @@ const SimulationComponent = (props: Props) => {
             controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         };
 
+        const updateRocketRotation = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => {
+            const newRotationX = (tick_data[currentTick]["gx"] * (Math.PI / 180)) + Math.PI / 2;
+            const newRotationY = tick_data[currentTick]["gy"] * (Math.PI / 180);
+            const newRotationZ = tick_data[currentTick]["gz"] * (Math.PI / 180);
+            lastRotation.push([newRotationX, newRotationY, newRotationZ]);
+            if (lastRotation.length > maxRotationHistory) {
+                lastRotation.shift();
+            }
+            const averageRotation = lastRotation.reduce((a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], [0, 0, 0]).map(v => v / lastRotation.length);
+            rocket.rotation.x = averageRotation[0];
+            rocket.rotation.y = averageRotation[1];
+            rocket.rotation.z = averageRotation[2];
+        }
+
         let startTime = new Date().getTime();
         const animate = function () {
             requestAnimationFrame(animate);
@@ -70,6 +86,7 @@ const SimulationComponent = (props: Props) => {
 
             if (currentTick < tick_data.length) {
                 updateRocketPosition(currentTick, rocket, controls); // TODO: add rotation and other axis through acceleration
+                updateRocketRotation(currentTick, rocket, controls);
                 // TODO: add a trail behind the rocket
                 // TODO: show a parachute when "d" is 1
                 // TODO: add a line to show the current altitude
