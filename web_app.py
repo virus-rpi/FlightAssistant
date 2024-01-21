@@ -152,6 +152,7 @@ class WebApp:
 
         simulation = [
             html.H2(children='Simulation', style={'width': '100%', 'textAlign': 'center'}),
+            html.P('Press "L" to jump to liftoff time'),
             html.Div(id="simulation_container", children=[
                 simulation_component.SimulationComponent(tick_data=self.tick_data, tick_speed=self.data.get("tick_speed")),
             ]),

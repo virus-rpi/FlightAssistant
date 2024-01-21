@@ -2,6 +2,8 @@ import React, {useLayoutEffect, useRef} from 'react';
 import {DashComponentProps} from '../props';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
+import {Simulate} from "react-dom/test-utils";
+import keyDown = Simulate.keyDown;
 
 type Props = {
     tick_data: object[],
@@ -17,7 +19,7 @@ const SimulationComponent = (props: Props) => {
         while (containerRef.current.firstChild) {
             containerRef.current.removeChild(containerRef.current.firstChild);
         }
-        // TODO: add a button to jump to liftoff
+        // TODO: add a button to jump to liftoff (first tick where "s" is 1)
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x87CEEB);
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -48,7 +50,7 @@ const SimulationComponent = (props: Props) => {
         controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         controls.update();
 
-        const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => { // TODO: smooth out the animation
+        const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => { // TODO: smooth out the animation with moving average
             rocket.position.z = tick_data[currentTick]["h"];
             controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         };
@@ -62,8 +64,9 @@ const SimulationComponent = (props: Props) => {
             let currentTick = Math.floor(delta * tick_speed);
 
             if (currentTick < tick_data.length) {
-                console.log("currentTick", currentTick);
                 updateRocketPosition(currentTick, rocket, controls); // TODO: add rotation and other axis through acceleration
+                // TODO: add a trail behind the rocket
+                // TODO: show a parachute when "d" is 1
             } else {
                 startTime = new Date().getTime();
             }
@@ -72,16 +75,32 @@ const SimulationComponent = (props: Props) => {
             renderer.render(scene, camera);
         };
 
+        const jumpToLiftoff = (_: Event) => {
+            const liftoffTick = tick_data.findIndex(tick => tick["s"] === 1);
+            startTime = new Date().getTime() - (liftoffTick / tick_speed * 1000);
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "L" || event.key === "l") {
+                jumpToLiftoff(event);
+            }
+        }
+
+        document.addEventListener("keyup", handleKeyDown);
+
         animate();
 
         return () => {
             console.log("SimulationComponent unmounted");
+            document.removeEventListener("keyup", handleKeyDown);
             // if (animationId) cancelAnimationFrame(animationId);
         }
     }, [tick_data, tick_speed]);
 
     return (
-        <div id={"simulation-canvas"} ref={containerRef} style={{width: "100%"}}/>
+    <>
+      <div id={"simulation-canvas"} ref={containerRef} style={{width: "100%", position: "relative"}}/>
+    </>
     )
 }
 
