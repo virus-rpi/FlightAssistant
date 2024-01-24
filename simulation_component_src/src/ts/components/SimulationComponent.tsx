@@ -29,10 +29,20 @@ const SimulationComponent = (props: Props) => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         containerRef.current.appendChild(renderer.domElement);
 
-        const floorGeometry = new THREE.PlaneGeometry(500, 500, 1, 1);
-        const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
-        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        const floorGeometry = new THREE.PlaneGeometry(10000, 10000, 1, 1);
+        const floorMaterialTop = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        floorMaterialTop.onBeforeCompile = (shader) => {
+          shader.fragmentShader = shader.fragmentShader.replace(
+            'vec4 diffuseColor = vec4( diffuse, opacity );',
+            'vec4 diffuseColor = vec4( diffuse, opacity ); if (gl_FrontFacing) diffuseColor.rgb = diffuseColor.rgb; else diffuseColor.rgb = vec3(0.545, 0.271, 0.075);'
+          );
+        };
+        const floor = new THREE.Mesh(floorGeometry, floorMaterialTop);
         scene.add(floor);
+
+        const gridHelper = new THREE.GridHelper(10000, 100);
+        gridHelper.rotation.x = Math.PI / 2;
+        scene.add(gridHelper);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
         scene.add(ambientLight);
@@ -99,7 +109,6 @@ const SimulationComponent = (props: Props) => {
             if (currentTick < tick_data.length) {
                 updateRocketPosition(currentTick, rocket, controls);
                 updateRocketRotation(currentTick, rocket);
-                // TODO: add other axis through acceleration
                 // TODO: add a trail behind the rocket
                 // TODO: show a parachute when "d" is 1
                 // TODO: add a line to show the current altitude
