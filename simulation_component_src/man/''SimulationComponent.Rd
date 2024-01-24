@@ -10,11 +10,13 @@
 }
 
 \usage{
-''SimulationComponent(id=NULL, tick_data=NULL, tick_speed=NULL)
+''SimulationComponent(id=NULL, accelerations=NULL, tick_data=NULL, tick_speed=NULL)
 }
 
 \arguments{
 \item{id}{Character. Unique ID to identify this component in Dash callbacks.}
+
+\item{accelerations}{List of named lists. }
 
 \item{tick_data}{List of named lists. }
 

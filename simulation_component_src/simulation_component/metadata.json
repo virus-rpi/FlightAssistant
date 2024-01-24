@@ -23,6 +23,18 @@
           "raw": "number"
         }
       },
+      "accelerations": {
+        "description": "",
+        "required": true,
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "object",
+            "raw": "object"
+          },
+          "raw": "object[]"
+        }
+      },
       "id": {
         "description": "Unique ID to identify this component in Dash callbacks.",
         "required": false,

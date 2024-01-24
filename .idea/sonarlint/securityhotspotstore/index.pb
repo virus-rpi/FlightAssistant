@@ -39,8 +39,6 @@ G.idea/sonarlint/issuestore/5/f/5ff047870c10984b56022da98969aab09c8ce07e,8\8\88
 Q.idea/sonarlint/securityhotspotstore/5/f/5ff047870c10984b56022da98969aab09c8ce07e,f\f\ffcc5e256d76c8bc3bbc7bd68ad49d029db86412
 Å
 Q.idea/sonarlint/securityhotspotstore/7/5/7503bd759a59d7292c341a443e87c60b6f7d904b,b\1\b126cc9168e7283da417d944a31f5f825fba47c0
-Å
-Q.idea/sonarlint/securityhotspotstore/0/f/0f947a4b53e60a5a036e59dbe19a61a7c7892e29,6\0\60b8f417ee237614616241f28f215364a86014dc
 w
 G.idea/sonarlint/issuestore/8/8/88a9255124c95bdc913197c120a8d560edc59c8e,a\e\ae9ddf453f55affea2d6b9e3973cac1eb2efb4e1
 Å
@@ -54,8 +52,6 @@ Q.idea/sonarlint/securityhotspotstore/9/f/9fe84ebb15faf917b7def6236dba604453cc61
 w
 G.idea/sonarlint/issuestore/0/7/071e93ac42f5b29fbc11074fdd222c1ea3f4761f,6\a\6ad5033be2c08bcc9a6a62127d5692aa4619cc04
 w
-G.idea/sonarlint/issuestore/0/f/0f947a4b53e60a5a036e59dbe19a61a7c7892e29,4\4\44e1561cbb19bd7ffca2cccc1e5bb7cfeef28d20
-w
 G.idea/sonarlint/issuestore/d/8/d8660f08de1bc88139dd54df6000daeed895166c,d\6\d65c44369e9ef679824b4a9f81a6dd0a87ce76f5
 @
 assets/style.css,5\0\50d983db3c46465e37c94b0c2ae789b31d18f9ac
@@ -63,8 +59,6 @@ G.idea/sonarlint/issuestore/d/8/d8660f08de1bc88139dd54df6000daeed895166c,d\6\d6
 components.py,2\3\23d100f2fdc84608e1d88a644a0db8b0c2f471c7
 7
 util.py,1\7\17c987dbb487ec852f3199b54e8bcdd5916bcf93
-D
-assets/simulation.js,1\f\1f9ef81e4d6a0c91d13e9814be10fa5f719ec9ab
 @
 assets/script.js,d\7\d7524b2008b16bc0083c9a499d617e0edce9da53
 5
@@ -117,3 +111,5 @@ U
 %simulation_component_src/package.json,9\6\96bd1e7ae89d516de8aa5c8457000ca660932d19
 =
 real_log.json,9\8\982a84a0aab7b437dda645a5199d42dc27f8635a
+9
+	lab.ipynb,3\a\3acb608345f2141b0f6ff5d7265718a98fb0203e

@@ -6,12 +6,14 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 type Props = {
     tick_data: object[],
     tick_speed: number,
+    accelerations: object[],
 } & DashComponentProps;
 
 const SimulationComponent = (props: Props) => {
     console.log("SimulationComponent props", props);
-    const { tick_data, tick_speed } = props;
+    const { tick_data, tick_speed , accelerations} = props;
     const containerRef = useRef(null);
+    const liftoffTick = tick_data.findIndex(tick => tick["s"] === 1);
 
     useLayoutEffect(() => {
         while (containerRef.current.firstChild) {
@@ -47,18 +49,28 @@ const SimulationComponent = (props: Props) => {
         controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         controls.update();
 
-        let lastPosition = [];
-        const maxPositionHistory = 10;
+        let lastHeight = [];
+        const maxHeightHistory = 10;
         let lastRotation = [];
         const maxRotationHistory = 5;
 
         const updateRocketPosition = (currentTick: number, rocket: THREE.Mesh, controls: OrbitControls) => {
-            const newPosition = tick_data[currentTick]["h"];
-            lastPosition.push(newPosition);
-            if (lastPosition.length > maxPositionHistory) {
-                lastPosition.shift();
+            const newHeight = tick_data[currentTick]["h"];
+            lastHeight.push(newHeight);
+            if (lastHeight.length > maxHeightHistory) {
+                lastHeight.shift();
             }
-            rocket.position.z = lastPosition.reduce((a, b) => a + b, 0) / lastPosition.length;
+
+            rocket.position.z = lastHeight.reduce((a, b) => a + b, 0) / lastHeight.length;
+
+            if (currentTick > liftoffTick) {
+                const accelerationX = accelerations["az"][currentTick] / tick_speed;
+                const accelerationY = accelerations["ay"][currentTick] / tick_speed;
+
+                rocket.position.x += accelerationX;
+                rocket.position.y += accelerationY;
+            }
+
             controls.target.set(rocket.position.x, rocket.position.y, rocket.position.z);
         };
 
@@ -70,7 +82,7 @@ const SimulationComponent = (props: Props) => {
             if (lastRotation.length > maxRotationHistory) {
                 lastRotation.shift();
             }
-            const averageRotation = lastRotation.reduce((a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], [0, 0, 0]).map(v => v / lastRotation.length);
+            const averageRotation = lastRotation.reduce((a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], [0, 0, 0]).map((v: number) => v / lastRotation.length);
             rocket.rotation.x = averageRotation[0];
             rocket.rotation.y = averageRotation[1];
             rocket.rotation.z = averageRotation[2];
@@ -91,16 +103,22 @@ const SimulationComponent = (props: Props) => {
                 // TODO: add a trail behind the rocket
                 // TODO: show a parachute when "d" is 1
                 // TODO: add a line to show the current altitude
+                // TODO: add google maps 3d view of starting location
+                // TODO: better rocket model
+                // TODO: text that shows the current tick and seconds elapsed
+                // TODO: on hover, show all sensor data for that tick
             } else {
                 startTime = new Date().getTime();
             }
             controls.update();
+            camera.rotation.z = 0;
 
             renderer.render(scene, camera);
         };
 
         const jumpToLiftoff = (_: Event) => {
-            const liftoffTick = tick_data.findIndex(tick => tick["s"] === 1);
+            rocket.position.x = 0;
+            rocket.position.y = 0;
             startTime = new Date().getTime() - (liftoffTick / tick_speed * 1000);
         }
 
@@ -122,9 +140,7 @@ const SimulationComponent = (props: Props) => {
     }, [tick_data, tick_speed]);
 
     return (
-    <>
       <div id={"simulation-canvas"} ref={containerRef} style={{width: "100%", position: "relative"}}/>
-    </>
     )
 }
 

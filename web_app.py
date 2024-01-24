@@ -3,7 +3,7 @@ from enum import Enum
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State, ClientsideFunction
 from components import height_plot, current_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
-from util import get_data, parse_contents
+from util import get_data, parse_contents, denoise
 import simulation_component
 
 
@@ -154,7 +154,15 @@ class WebApp:
             html.H2(children='Simulation', style={'width': '100%', 'textAlign': 'center'}),
             html.P('Press "L" to jump to liftoff time'),
             html.Div(id="simulation_container", children=[
-                simulation_component.SimulationComponent(tick_data=self.tick_data, tick_speed=self.data.get("tick_speed")),
+                simulation_component.SimulationComponent(
+                    tick_data=self.tick_data,
+                    tick_speed=self.data.get("tick_speed"),
+                    accelerations={
+                        "ax": denoise([element["ax"] for element in self.tick_data], 4, 2),
+                        "ay": denoise([element["ay"] for element in self.tick_data], 4, 2),
+                        "az": denoise([element["az"] for element in self.tick_data], 4, 2)
+                    }
+                ),
             ]),
         ]
 
@@ -192,7 +200,7 @@ class WebApp:
             [Input("vanta-container", "id")],
         )
 
-        self.app.run_server(debug=True, host="localhost")
+        self.app.run_server(debug=True, host="localhost", port=5000)
 
 
 if __name__ == '__main__':
