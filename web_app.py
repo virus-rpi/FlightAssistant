@@ -2,9 +2,9 @@ import functools
 from enum import Enum
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State, ClientsideFunction
-from components import height_plot, current_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
+from components import height_plot, voltage_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
 from util import get_data, parse_contents, denoise
-import simulation_component
+# import simulation_component
 
 
 class ContentMode(Enum):  # TODO: Add config editor mode and control mode
@@ -69,9 +69,9 @@ class WebApp:
             return height_plot(self.tick_data, self.span)
 
         @functools.lru_cache(maxsize=32)
-        @self.app.callback(Output('current_graph', 'figure'), Input('upload-data', 'contents'))
+        @self.app.callback(Output('voltage_graph', 'figure'), Input('upload-data', 'contents'))
         def update(_):
-            return current_plot(self.tick_data)
+            return voltage_plot(self.tick_data)
 
         @functools.lru_cache(maxsize=32)
         @self.app.callback(Output('rot_graph', 'figure'), Input('upload-data', 'contents'))
@@ -128,10 +128,10 @@ class WebApp:
                 id='height_graph',
                 figure=height_plot(self.tick_data, self.span)
             ),
-            html.H2(children='Current'),
+            html.H2(children='Voltage'),
             dcc.Graph(
-                id='current_graph',
-                figure=current_plot(self.tick_data)
+                id='voltage_graph',
+                figure=voltage_plot(self.tick_data)
             ),
             html.H2(children='Rotation'),
             dcc.Graph(
@@ -154,15 +154,15 @@ class WebApp:
             html.H2(children='Simulation', style={'width': '100%', 'textAlign': 'center'}),
             html.P('Press "L" to jump to liftoff time'),
             html.Div(id="simulation_container", children=[
-                simulation_component.SimulationComponent(
-                    tick_data=self.tick_data,
-                    tick_speed=self.data.get("tick_speed"),
-                    accelerations={
-                        "ax": denoise([element["ax"] for element in self.tick_data], 4, 2),
-                        "ay": denoise([element["ay"] for element in self.tick_data], 4, 2),
-                        "az": denoise([element["az"] for element in self.tick_data], 4, 2)
-                    }
-                ),
+                # simulation_component.SimulationComponent(
+                #    tick_data=self.tick_data,
+                #    tick_speed=self.data.get("tick_speed"),
+                #    accelerations={
+                #        "ax": denoise([element["ax"] for element in self.tick_data], 4, 2),
+                #        "ay": denoise([element["ay"] for element in self.tick_data], 4, 2),
+                #        "az": denoise([element["az"] for element in self.tick_data], 4, 2)
+                #    }
+                # ),
             ]),
         ]
 
@@ -200,7 +200,7 @@ class WebApp:
             [Input("vanta-container", "id")],
         )
 
-        self.app.run_server(debug=True, host="localhost", port=5000)
+        self.app.run(debug=False, host="localhost", port=5000)
 
 
 if __name__ == '__main__':

@@ -72,47 +72,47 @@ def height_plot(tick_data, span):
     return fig
 
 
-def create_current_ranges(tick_data):
-    current_ranges = []
-    current_status = None
+def create_voltage_ranges(tick_data):
+    voltage_ranges = []
+    voltage_status = None
     range_start_tick = None
 
     for tick_index, tick in enumerate(tick_data):
-        current_value = tick["v"]
-        tick_status = "ok" if 3 <= current_value <= 4.2 else "bad"
+        voltage_value = tick["v"]
+        tick_status = "ok" if 3 <= voltage_value <= 4.2 else "bad"
 
-        if current_status is None:
-            current_status = tick_status
+        if voltage_status is None:
+            voltage_status = tick_status
             range_start_tick = tick_index
-        elif tick_status != current_status:
-            current_ranges.append((range_start_tick - 1, tick_index, current_status))
-            current_status = tick_status
+        elif tick_status != voltage_status:
+            voltage_ranges.append((range_start_tick - 1, tick_index, voltage_status))
+            voltage_status = tick_status
             range_start_tick = tick_index
 
-    if current_status is not None:
-        current_ranges.append((range_start_tick - 1, len(tick_data), current_status))
+    if voltage_status is not None:
+        voltage_ranges.append((range_start_tick - 1, len(tick_data), voltage_status))
 
-    return current_ranges
+    return voltage_ranges
 
 
-def current_plot(tick_data):
-    currents = [tick["v"] for tick in tick_data]
-    current_ranges = create_current_ranges(tick_data)
+def voltage_plot(tick_data):
+    voltages = [tick["v"] for tick in tick_data]
+    voltage_ranges = create_voltage_ranges(tick_data)
 
-    fig = px.line(DataFrame(data=DataFrame({'Currents [v]': currents})))
+    fig = px.line(DataFrame(data=DataFrame({'voltages [v]': voltages})))
 
-    y0 = min(currents)
-    y1 = max(currents)
+    y0 = min(voltages)
+    y1 = max(voltages)
 
-    for current_range in current_ranges:
+    for voltage_range in voltage_ranges:
         fig.add_shape(
             type="rect",
-            x0=current_range[0],
-            x1=current_range[1],
+            x0=voltage_range[0],
+            x1=voltage_range[1],
             y0=y0,
             y1=y1,
-            fillcolor="green" if current_range[2] == "ok" else "red",
-            opacity=0.1 if current_range[2] == "ok" else 0.4,
+            fillcolor="green" if voltage_range[2] == "ok" else "red",
+            opacity=0.1 if voltage_range[2] == "ok" else 0.4,
             line=dict(
                 width=0,
             ),
