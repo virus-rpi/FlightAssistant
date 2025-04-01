@@ -3,7 +3,7 @@ from enum import Enum
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State, ClientsideFunction
 from components import height_plot, voltage_plot, degrees_plot, acceleration_plot, velocity_plot, avg_tick_speed
-from util import get_data, parse_contents, denoise
+from util import get_data, parse_contents
 # import simulation_component
 
 
