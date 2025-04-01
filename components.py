@@ -4,15 +4,14 @@ import plotly.express as px
 
 
 def height_plot(tick_data, span):
-    heights = [i['h'] for i in tick_data]
-    heights = convolve(heights, ones(span * 2 + 1) / (span * 2 + 1), mode="same")
+    heights = convolve([tick['h'] for tick in tick_data], ones(span * 2 + 1) / (span * 2 + 1), mode="same")
 
-    deployed_ticks = [i for i, j in enumerate(tick_data) if j["d"] == "1"]
-    ground_ticks = [i for i, j in enumerate(tick_data) if j["s"] == 0]
-    ascent_ticks = [i for i, j in enumerate(tick_data) if j["s"] == 1]
-    descent_ticks = [i for i, j in enumerate(tick_data) if j["s"] == 2]
+    deployed_ticks = [i for i, tick in enumerate(tick_data) if tick["d"] == "1"]
+    ground_ticks = [i for i, tick in enumerate(tick_data) if tick["s"] == 0]
+    ascent_ticks = [i for i, tick in enumerate(tick_data) if tick["s"] == 1]
+    descent_ticks = [i for i, tick in enumerate(tick_data) if tick["s"] == 2]
 
-    fig = px.line(DataFrame(data=DataFrame({'Height [m]': heights})))
+    fig = px.line(DataFrame(data=DataFrame({'Height [m]': heights})), template="plotly_dark")
 
     OPACITY = 0.3
     Y1_FACTOR = 4
@@ -68,7 +67,6 @@ def height_plot(tick_data, span):
             fillcolor="yellow",
             opacity=OPACITY,
         )
-    fig.update_layout(template="plotly_dark")
     return fig
 
 
@@ -99,7 +97,7 @@ def voltage_plot(tick_data):
     voltages = [tick["v"] for tick in tick_data]
     voltage_ranges = create_voltage_ranges(tick_data)
 
-    fig = px.line(DataFrame(data=DataFrame({'voltages [v]': voltages})))
+    fig = px.line(DataFrame(data=DataFrame({'voltages [v]': voltages})), template="plotly_dark")
 
     y0 = min(voltages)
     y1 = max(voltages)
@@ -118,8 +116,6 @@ def voltage_plot(tick_data):
             ),
         )
 
-    fig.update_layout(template="plotly_dark")
-
     return fig
 
 
@@ -128,10 +124,10 @@ def degrees_plot(tick_data):
     gy = []
     gz = []
 
-    for i in tick_data:
-        gx.append(i["gx"])
-        gy.append(i["gy"])
-        gz.append(i["gz"])
+    for tick in tick_data:
+        gx.append(tick["gx"])
+        gy.append(tick["gy"])
+        gz.append(tick["gz"])
 
     return px.line(DataFrame(data=DataFrame({'gx [°]': gx, 'gy [°]': gy, 'gz [°]': gz}))).update_layout(
         template="plotly_dark")
@@ -142,20 +138,17 @@ def acceleration_plot(tick_data):
     ay = []
     az = []
 
-    for i in tick_data:
-        ax.append(i["ax"])
-        ay.append(i["ay"])
-        az.append(i["az"])
+    for tick in tick_data:
+        ax.append(tick["ax"])
+        ay.append(tick["ay"])
+        az.append(tick["az"])
 
     return px.line(DataFrame(data=DataFrame({'ax [m/s^2]': ax, 'ay [m/s^2]': ay, 'az [m/s^2]': az}))).update_layout(
         template="plotly_dark")
 
 
 def velocity_plot(tick_data, data, span):
-    heights = []
-    for i in tick_data:
-        heights.append(i["h"])
-    heights = convolve(heights, ones(span * 2 + 1) / (span * 2 + 1), mode="same")
+    heights = convolve([tick["h"] for tick in tick_data], ones(span * 2 + 1) / (span * 2 + 1), mode="same")
 
     velocity_list = []
     v = 0
@@ -175,11 +168,5 @@ def velocity_plot(tick_data, data, span):
 
 
 def avg_tick_speed(tick_data):
-    tick_time = []
-
-    for i in tick_data:
-        tick_time.append(i["tt"])
-
-    avg_tick_time = (sum(tick_time) / len(tick_time))
-
-    return str(round(avg_tick_time, 2))
+    tick_time = [tick["tt"] for tick in tick_data]
+    return str(round(sum(tick_time) / len(tick_time), 2))
